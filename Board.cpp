@@ -20,7 +20,7 @@ void Board::fillRegion(int row, int col)
             while (true)
             {
                 num = randomGenerator(9);
-                if (cekRegion(row, col, num))
+                if (checkRegion(row, col, num))
                 {
                     {
                         fill(row + i, col + j, num);
@@ -125,4 +125,66 @@ void Board::generateNumber()
     }
 }
 
+bool Board::checkRegion(int rowStart, int colStart, int num)
+{
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            if (board[rowStart + i][colStart + j] == num)
+                return false;
 
+    return true;
+}
+
+bool Board::checkRow(int row, int num)
+{
+    for (int j = 0; j < 9; j++)
+    {
+        if (board[row][j] == num)
+            return false;
+    }
+    return true;
+
+}
+
+bool Board::checkColumn(int col, int num)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        if (board[i][col] == num)
+            return false;
+    }
+    return true;
+}
+
+bool Board::isValid(int row, int col, int num)
+{
+    return (checkColumn(col, num) && checkRow(row, num) && checkRegion(row - row % 3, col - col % 3, num));
+}
+
+void Board::fill(int row, int col, int num)
+{
+
+    board[row][col] = num;
+}
+
+void Board::remove(int row, int col)
+{
+    board[row][col] = 0;
+}
+
+void Board::printBoard()
+{
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            cout << board[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int Board::getNumber(int row, int col)
+{
+    return board[row][col];
+}

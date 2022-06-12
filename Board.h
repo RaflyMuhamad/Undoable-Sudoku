@@ -1,28 +1,37 @@
 #pragma once
-#include "Head.h"
+#include <iostream>
+#include <conio.h> 
+#include <stdlib.h>
+#include <stack>
 
-class Board
-{
-	int board[9][9];
-	void fillRegion(int, int);
-	bool fillRest();
-	bool findEmpty(int&, int&);
 
-	int randomGenerator(int);
+
+class Board {
+private:
+	int boardSize;
+	int boardData[10][10];
+	bool mutableBoard[10][10]; // mutable = true = 1, immutable = false = 0
+	int cursorPosition[2];
 
 public:
 	Board();
 
-	void generateNumber();
-	bool checkRegion(int, int, int);
-	bool checkRow(int, int);
-	bool checkColumn(int, int);
-	bool isValid(int, int, int);
+	int GetBoardSize();
 
-	void fill(int, int, int);
-	void remove(int, int);
-	void printBoard();
+	int GetBoardData(int x, int y);
+	void SetBoardData(int x, int y, int value);
+	void ResetBoardData();
 
-	int	 getNumber(int, int);
+	bool GetMutableBoard(int x, int y);
+	void SetMutableBoard(int x, int y, bool value);
+
+	int GetCursorPosition(int a);
+	void SetCursorPosition(int a, int value);
+	void ResetCursorPosition();
+
+	void DrawBoard();
+
+	bool CheckBoardColumn();
+	bool CheckBoardRow();
+	bool CheckBoardEach3x3();
 };
-

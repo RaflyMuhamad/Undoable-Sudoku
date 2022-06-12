@@ -1,190 +1,187 @@
 #include "Board.h"
 
-int Board::randomGenerator(int num)
-{
-    int random;
 
-    random = rand() % num + 1;
 
-    return random;
+Board::Board() {
+	boardSize = 9;
+	ResetBoardData();
+	ResetCursorPosition();
 }
 
-void Board::fillRegion(int row, int col)
-{
-    int num = 0;
-    for (int i = 0; i < 3; i++) // row
-    {
-        for (int j = 0; j < 3; j++) // column
-        {
-
-            while (true)
-            {
-                num = randomGenerator(9);
-                if (checkRegion(row, col, num))
-                {
-                    {
-                        fill(row + i, col + j, num);
-                        break;
-                    }
-                }
-            }
-        }
-    }
+int Board::GetBoardSize() {
+	return boardSize;
 }
 
-bool Board::fillRest()
-{
-    int row, col;
+int Board::GetBoardData(int x, int y) {
+	return boardData[x][y];
+}
 
-    // If there is no unassigned location,
-    // we are done
-    if (!findEmpty(row, col))
-        // success!
-        return true;
+void Board::SetBoardData(int x, int y, int value) {
+	boardData[x][y] = value;
+}
+void Board::ResetBoardData() {
+	for (int i = 0; i < boardSize; i++) {
+		for (int j = 0; j < boardSize; j++) {
+			boardData[i][j] = 0;
+		}
+	}
+}
 
-    // Consider digits 1 to 9
-    for (int num = 1; num <= 9; num++)
-    {
-        // Check if looks promising
-        if (isValid(row, col, num))
-        {
-            // Make tentative assignment
-            board[row][col] = num;
+bool Board::GetMutableBoard(int x, int y) {
+	return mutableBoard[x][y];
+}
+void Board::SetMutableBoard(int x, int y, bool value) {
+	mutableBoard[x][y] = value;
+}
 
-            // Return, if success
-            if (fillRest())
-                return true;
+int Board::GetCursorPosition(int a) {
+	return cursorPosition[a];
+}
+void Board::SetCursorPosition(int a, int value) {
+	cursorPosition[a] = value;
+}
+void Board::ResetCursorPosition() {
+	cursorPosition[0] = 0;
+	cursorPosition[1] = 0;
+}
 
-            // Failure, unmake & try again
-            board[row][col] = 0;
-        }
-    }
+void Board::DrawBoard() {
+	system("cls");
+	
+	// Title
+	std::cout << "\n                      SUDOKU";
 
-    // This triggers backtracking
-    return false;
+	// Margin Top
+	std::cout << "\n\n";
+
+	for (int i = 0; i < boardSize; i++) {
+		// Margin Left
+		std::cout << "     ";
+
+		if (i % 3 == 0 && i != 0) {
+			std::cout << " #";
+			for (int j = 0; j < boardSize; j++) {
+				std::cout << "####";
+			}
+			std::cout << "\n";
+			std::cout << "     ";
+		}
+
+		// Number
+		for (int j = 0; j < boardSize; j++) {
+			
+			// Dividers between boxes
+			if (j % 3 == 0 && j != 0) {
+				std::cout << " # ";
+			}
+			else {
+				std::cout << " | ";
+			}
+			
+			// Box contain
+			if (boardData[i][j] == 0) {
+				std::cout << " ";
+			}
+			else {
+				std::cout << boardData[i][j];
+			}
+		} 
+		// Close Box 
+		std::cout << " | ";
+
+		// For User Interface ( right side of the screen )
+		if (i == 1) {
+			std::cout << "           Press p to exit";
+		}
+		else if (i == 3) {
+			std::cout << "           Press z to undo";
+		}
+		else if (i == 5) {
+			std::cout << "           Press y to redo";
+		}
+
+		// Next Line
+		std::cout << std::endl;
+
+		// Margin Left
+		std::cout << "     ";
+
+		// Cursor
+		for (int j = 0; j < boardSize; j++) {
+
+			// Dividers between boxes
+			if (j % 3 == 0 && j != 0 && i != boardSize - 1) {
+				std::cout << " # ";
+			}
+			else {
+				std::cout << "   ";
+			}
+
+			// The Cursor
+			if (cursorPosition[0] == i && cursorPosition[1] == j) {
+				std::cout << "^";
+			}
+			else {
+				std::cout << " ";
+			}
+		}
+
+		// Next Line
+		std::cout << std::endl;
+	}
+}
+
+bool Board::CheckBoardColumn() {
+	// Column
+	for (int i = 0; i < boardSize; i++) {
+		for (int j = 0; j < boardSize - 1; j++) {
+			for (int k = j + 1; k < boardSize; k++) {
+				if (boardData[i][j] == boardData[i][k]) {
+					return false;
+				}
+			}
+		}
+	}
+}
+bool Board::CheckBoardRow() {
+	// Row
+	for (int i = 0; i < boardSize; i++) {
+		for (int j = 0; j < boardSize - 1; j++) {
+			for (int k = j + 1; k < boardSize; k++) {
+				if (boardData[j][i] == boardData[k][i]) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+bool Board::CheckBoardEach3x3() {
+	// Each 3x3
+	for (int i = 0; i < boardSize; i += 3) {
+		for (int j = 0; j < boardSize; j += 3) {
+			for (int k = i; k < i + 3; k++) {
+				for (int l = j; l < i + 3; l++) {
+					for (int m = k; m < i + 3; m++) {
+						for (int n = l; n < i + 3; n++) {
+							if (k == m && l == n) {
+								n++;
+							}
+							else {
+								if (boardData[k][l] == boardData[m][n]) {
+									return false;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return true;
 }
 
 
 
-bool Board::findEmpty(int& row, int& col)
-{
-    for (row = 0; row < 9; row++)
-    {
-        for (col = 0; col < 9; col++)
-        {
-            if (board[row][col] == 0)
-                return true;
-        }
-    }
-    return false;
-}
-
-
-Board::Board()
-{
-    srand(time(0));
-    for (int i = 0; i < 9; i++) // init board with 0
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            fill(i, j, 0);
-        }
-    }
-
-    generateNumber();
-    printBoard();
-}
-
-void Board::generateNumber()
-{
-    // fill diagonal
-    for (int i = 0; i < 9; i += 3)   // iterating through diagonal region
-    {
-        //cout << "Region " << i << " , " << i << endl;
-        fillRegion(i, i);
-    }
-
-    // fill remaining blocks
-    fillRest();
-
-    // remove number in block randomly
-    int count = 20; // Number of removed block
-    while (count != 0)
-    {
-        int blockId = randomGenerator(81) - 1;
-        cout << blockId << endl;
-        // extract coordinates i  and j
-        int i = blockId / 9;
-        int j = blockId % 9;
-
-        if (board[i][j] != 0)
-        {
-            count--;
-            board[i][j] = 0;
-        }
-    }
-}
-
-bool Board::checkRegion(int rowStart, int colStart, int num)
-{
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            if (board[rowStart + i][colStart + j] == num)
-                return false;
-
-    return true;
-}
-
-bool Board::checkRow(int row, int num)
-{
-    for (int j = 0; j < 9; j++)
-    {
-        if (board[row][j] == num)
-            return false;
-    }
-    return true;
-
-}
-
-bool Board::checkColumn(int col, int num)
-{
-    for (int i = 0; i < 9; i++)
-    {
-        if (board[i][col] == num)
-            return false;
-    }
-    return true;
-}
-
-bool Board::isValid(int row, int col, int num)
-{
-    return (checkColumn(col, num) && checkRow(row, num) && checkRegion(row - row % 3, col - col % 3, num));
-}
-
-void Board::fill(int row, int col, int num)
-{
-
-    board[row][col] = num;
-}
-
-void Board::remove(int row, int col)
-{
-    board[row][col] = 0;
-}
-
-void Board::printBoard()
-{
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            cout << board[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
-
-int Board::getNumber(int row, int col)
-{
-    return board[row][col];
-}
